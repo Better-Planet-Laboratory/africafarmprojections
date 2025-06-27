@@ -47,3 +47,15 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Output files - exclude large files but keep smaller components
+output/*.rds
+output/*.shp
+
+# Input files - exclude large shapefiles
+input/fsfix.shp
+input/handoff/SmallholderMap_20201202/SmallholderMap_20201202.shp
+
+# System files
+.DS_Store
+Thumbs.db
