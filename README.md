@@ -3,44 +3,11 @@
 
 ## Overview
 
-This repository contains a comprehensive analysis of African farm size
+This repository contains an analysis of African farm size
 distributions from 2000-2060, combining spatial farm structure data with
 demographic projections to create corrected and harmonized datasets for
 agricultural research and policy applications.
 
-## Usage
-
-### Requirements
-
-``` r
-library(sf)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(readxl)
-library(terra)
-library(mapview)
-```
-
-### Running the Analysis
-
-``` r
-# Data preprocessing and harmonization
-source("fsdistfix.R")
-
-# Full analysis with projections  
-source("test.R")
-```
-
-### Loading Output Data
-
-``` r
-# Load spatial results
-farm_data <- st_read("output/fsfix_corrected_2000_2060.shp")
-
-# Load distribution data
-distributions <- readRDS("output/full_farm_distributions_shifted.rds")
-```
 
 ## Input Data Sources
 
@@ -53,18 +20,18 @@ distributions <- readRDS("output/full_farm_distributions_shifted.rds")
 - **File**: `input/ssp2t.rds`
 - **Description**: Farm number and agricultural area projections 2000-2060
 - **References**: 
-  - Publication: https://www.nature.com/articles/s41893-023-01110-y
-  - Code repository: https://github.com/Better-Planet-Laboratory/farm-decline
+  - Publication: [Nature Sustainability article](https://www.nature.com/articles/s41893-023-01110-y)
+  - Code repository: [Better Planet Laboratory GitHub](https://github.com/Better-Planet-Laboratory/farm-decline)
 
 ### 3. FAO World Census of Agriculture (2010)
 - **File**: `input/WCA_2010.csv`
 - **Description**: Validation and correction data for farm structure
-- **Source**: https://www.fao.org/world-census-agriculture/en
+- **Source**: [FAO World Census of Agriculture](https://www.fao.org/world-census-agriculture/en)
 
 ### 4. Additional Data Sources
 - **South Africa farm estimates**: Aliber & Hart (2009) smallholder farmer support study
-- **South Sudan demographics**: World Bank population data (https://data.worldbank.org/)
-- **Farm area estimates**: Ricciardi et al. (2018) gross area data
+- **South Sudan demographics**: [World Bank population data](https://data.worldbank.org/)
+- **Farm area estimates**: [Ricciardi et al. (2018) gross area data](https://www.sciencedirect.com/science/article/pii/S2211912417301293)
 
 ## Mathematical Methodology
 
@@ -200,85 +167,8 @@ p_j^continental = (1/|C|) × Σ_{c∈C} (N_cj / Σ_j N_cj)
 
 where *C* is the set of countries with complete data.
 
-## Output Dataset
 
-### Primary Output: `fsfix_corrected_2000_2060.shp`
-
-**Spatial Coverage**: All African countries with available data
-**Temporal Range**: 2000, 2010, 2020, 2030, 2040, 2050, 2060
-**Resolution**: Administrative level 1 (states/provinces)
-
-#### Variables
-
-| Variable         | Description                 | Units             |
-|------------------|-----------------------------|-------------------|
-| `GID_0`          | ISO3 country code           | -                |
-| `NAME_0`         | Country name                | -                |
-| `NAME_1`         | Administrative unit name    | -                |
-| `Year`           | Projection year             | -                |
-| `N0_1`           | Farms 0-1 hectares          | count             |
-| `N1_2`           | Farms 1-2 hectares          | count             |
-| `N2_5`           | Farms 2-5 hectares          | count             |
-| `N5_10`          | Farms 5-10 hectares         | count             |
-| `N10_20`         | Farms 10-20 hectares        | count             |
-| `N20_`           | Farms 20+ hectares          | count             |
-| `treatment_flag` | Processing method applied   | categorical       |
-| `Median.smooth`  | SSP2T projected total farms | count             |
-| `Agarea.kha`     | Agricultural area           | thousand hectares |
-
-#### Treatment Flags
-
--   `"Case A: Data from both fsfix and SSP2T"` - Full methodology
-    applied
--   `"Case B: SSP2T only - continental average disaggregation"` -
-    Continental averages used
--   `"Case C: fsfix only - Ethiopia growth trend applied"` - Growth
-    trends extrapolated
--   `"Case A/C Hybrid: fsfix data exists, but SSP2T missing for this year. Used ETH growth."` -
-    Mixed approach
--   `"No farm data available"` - No processing possible
-
-### Additional Outputs
-
-1.  **`full_farm_distributions_all_countries.rds`**
-    -   Individual farm size samples before mean-shift correction
-    -   Detailed distribution data for statistical analysis
-
-2.  **`full_farm_distributions_shifted.rds`**
-    -   Individual farm size samples after mean-shift correction
-    -   Used for validation and distribution analysis
-
-3.  **Validation Plots** (in `figs/` directory)
-    -   `validation_totals_check.png` - SSP2T vs output totals
-    -   `validation_areas_check.png` - Agricultural area consistency
-    -   `africa_farms_2000_2050.png` - Spatial distribution maps
-    -   `africa_farm_size_distribution_evolution.png` - Distribution
-        evolution
-
-## Validation and Quality Control
-
-### 1. Farm Total Consistency
-
-Validates that output totals match SSP2T projections within tolerance:
-
-```         
-|N'_total - N_SSP2T| / N_SSP2T < ε
-```
-
-### 2. Agricultural Area Consistency
-
-Validates mean farm sizes align with area constraints:
-
-```         
-|A_implied - A_target| / A_target < ε
-```
-
-### 3. Distribution Preservation
-
-Ensures farm size distribution shapes remain realistic after
-corrections.
-
-## Data Corrections and Pre-processing
+## Other Data Corrections and Pre-processing
 
 ### Key Data Corrections Applied
 
@@ -345,6 +235,123 @@ FAO <- FAO %>%
 
 3. **Geometric Consistency**: Validation of spatial data integrity and coordinate systems
 
+
+## Output Dataset
+
+### Primary Output: `fsfix_corrected_2000_2060.shp`
+
+**Spatial Coverage**: All African countries with available data
+**Temporal Range**: 2000, 2010, 2020, 2030, 2040, 2050, 2060
+**Resolution**: Administrative level 1 (states/provinces)
+
+#### Variables
+
+| Variable         | Description                 | Units             |
+|------------------|-----------------------------|-------------------|
+| `GID_0`          | ISO3 country code           | -                |
+| `NAME_0`         | Country name                | -                |
+| `NAME_1`         | Administrative unit name    | -                |
+| `Year`           | Projection year             | -                |
+| `N0_1`           | Farms 0-1 hectares          | count             |
+| `N1_2`           | Farms 1-2 hectares          | count             |
+| `N2_5`           | Farms 2-5 hectares          | count             |
+| `N5_10`          | Farms 5-10 hectares         | count             |
+| `N10_20`         | Farms 10-20 hectares        | count             |
+| `N20_`           | Farms 20+ hectares          | count             |
+| `treatment_flag` | Processing method applied   | categorical       |
+| `Median.smooth`  | SSP2T projected total farms | count             |
+| `Agarea.kha`     | Agricultural area           | thousand hectares |
+
+#### Treatment Flags
+
+-   `"Case A: Data from both fsfix and SSP2T"` - Full methodology
+    applied
+-   `"Case B: SSP2T only - continental average disaggregation"` -
+    Continental averages used
+-   `"Case C: fsfix only - Ethiopia growth trend applied"` - Growth
+    trends extrapolated
+-   `"Case A/C Hybrid: fsfix data exists, but SSP2T missing for this year. Used ETH growth."` -
+    Mixed approach
+-   `"No farm data available"` - No processing possible
+
+### Additional Outputs
+
+1.  **`full_farm_distributions_all_countries.rds`**
+    -   Individual farm size samples before mean-shift correction
+    -   Detailed distribution data for statistical analysis
+
+2.  **`full_farm_distributions_shifted.rds`**
+    -   Individual farm size samples after mean-shift correction
+    -   Used for validation and distribution analysis
+
+3.  **Validation Plots** (in `figs/` directory)
+    -   `validation_totals_check.png` - SSP2T vs output totals
+    -   `validation_areas_check.png` - Agricultural area consistency
+    -   `africa_farms_2000_2050.png` - Spatial distribution maps
+    -   `africa_farm_size_distribution_evolution.png` - Distribution
+        evolution
+
+
+
+## Validation and Quality Control
+
+### 1. Farm Total Consistency
+
+Validates that output totals match SSP2T projections within tolerance:
+
+```         
+|N'_total - N_SSP2T| / N_SSP2T < ε
+```
+
+### 2. Agricultural Area Consistency
+
+Validates mean farm sizes align with area constraints:
+
+```         
+|A_implied - A_target| / A_target < ε
+```
+
+### 3. Distribution Preservation
+
+Ensures farm size distribution shapes remain realistic after
+corrections.
+
+
+## Usage
+
+### Requirements
+
+``` r
+library(sf)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readxl)
+library(terra)
+library(mapview)
+```
+
+### Running the Analysis
+
+``` r
+# Data preprocessing and harmonization
+source("fsdistfix.R")
+
+# Full analysis with projections  
+source("test.R")
+```
+
+### Loading Output Data
+
+``` r
+# Load spatial results
+farm_data <- st_read("output/fsfix_corrected_2000_2060.shp")
+
+# Load distribution data
+distributions <- readRDS("output/full_farm_distributions_shifted.rds")
+```
+
+
 ## References
 
 -   Aliber, M., & Hart, T. G. (2009). Should subsistence agriculture be
@@ -360,6 +367,8 @@ FAO <- FAO %>%
 
 -   World Bank. Population data. Available:
     <https://data.worldbank.org/>
+
+
 
 ## Citation
 
