@@ -706,21 +706,7 @@ main <- function() {
     ) %>%
     st_as_sf()
   
-  # Add countries that are in SSP2T but not in fsfix (Case B without geometry)
-  # These need synthetic geometry
-  countries_needing_synthetic <- countries_b_no_geometry
   
-  if (length(countries_needing_synthetic) > 0) {
-    synthetic_results <- final_results %>%
-      filter(GID_0 %in% countries_needing_synthetic) %>%
-      mutate(geometry = st_sfc(st_point(c(0, 0)), crs = st_crs(fsfix))) %>%
-      st_as_sf() %>%
-      select(GID_0, NAME_0, NAME_1, Year, all_of(FARM_SIZE_COLS), 
-             treatment_flag, Median.smooth, Agarea.kha, geometry)
-    
-    # Combine with main results
-    final_output <- bind_rows(final_output, synthetic_results)
-  }
   # Save outputs ---------------------------------------------------------------
   cat("Saving final outputs...\n")
   cat("Saving final outputs...\n")
@@ -770,4 +756,5 @@ main <- function() {
 
 # Run analysis
 main()
+
 
