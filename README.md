@@ -8,19 +8,67 @@ distributions from 2000-2060, combining spatial farm structure data with
 demographic projections to create corrected and harmonized datasets for
 agricultural research and policy applications.
 
+## Usage
+
+### Requirements
+
+``` r
+library(sf)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readxl)
+library(terra)
+library(mapview)
+```
+
+### Running the Analysis
+
+``` r
+# Data preprocessing and harmonization
+source("fsdistfix.R")
+
+# Full analysis with projections  
+source("test.R")
+```
+
+### Loading Output Data
+
+``` r
+# Load spatial results
+farm_data <- st_read("output/fsfix_corrected_2000_2060.shp")
+
+# Load distribution data
+distributions <- readRDS("output/full_farm_distributions_shifted.rds")
+```
+
+## Input Data Sources
+
+### 1. LUGE Smallholder Map (2020)
+- **File**: `input/handoff/SmallholderMap_20201202/SmallholderMap_20201202.shp`
+- **Description**: Spatial farm size distribution data with admin-level disaggregation for African countries
+- **Metadata**: `input/handoff/SmallholderMapping_Metadata.xlsx`
+
+### 2. SSP2T Demographic Projections
+- **File**: `input/ssp2t.rds`
+- **Description**: Farm number and agricultural area projections 2000-2060
+- **References**: 
+  - Publication: https://www.nature.com/articles/s41893-023-01110-y
+  - Code repository: https://github.com/Better-Planet-Laboratory/farm-decline
+
+### 3. FAO World Census of Agriculture (2010)
+- **File**: `input/WCA_2010.csv`
+- **Description**: Validation and correction data for farm structure
+- **Source**: https://www.fao.org/world-census-agriculture/en
+
+### 4. Additional Data Sources
+- **South Africa farm estimates**: Aliber & Hart (2009) smallholder farmer support study
+- **South Sudan demographics**: World Bank population data (https://data.worldbank.org/)
+- **Farm area estimates**: Ricciardi et al. (2018) gross area data
+
 ## Mathematical Methodology
 
-### 1. Data Integration Framework
-
-The analysis employs a three-case processing framework:
-
--   **Case A**: Countries with both spatial farm data (fsfix) and
-    demographic projections (SSP2T)
--   **Case B**: Countries with demographic projections but limited/no
-    spatial farm data\
--   **Case C**: Countries with only spatial farm data
-
-### 2. Farm Size Distribution Sampling
+### 1. Farm Size Distribution Sampling
 
 For each farm size class *i* with *N*<sub>i</sub> farms, the algorithm
 generates representative farm sizes:
@@ -52,7 +100,7 @@ w_i = N_i / n_samples_i
 
 where *n_samples*<sub>i</sub> = min(*N*<sub>i</sub>, MAX_SAMPLE_SIZE).
 
-### 3. Mean-Shift Correction
+### 2. Mean-Shift Correction
 
 To ensure consistency with agricultural area constraints, the algorithm
 applies mean-shift correction:
@@ -81,7 +129,7 @@ A_o = Σ(s_i × w_i) / Σ(w_i)
 s'_i = s_i × α
 ```
 
-### 4. Rebinning Algorithm
+### 3. Rebinning Algorithm
 
 Corrected farm sizes are rebinned into standardized classes:
 
@@ -94,7 +142,17 @@ N'_10-20 = Σ w_i for s'_i ∈ (10, 20]
 N'_20+ = Σ w_i for s'_i > 20
 ```
 
-### 5. Country-Specific Processing
+### 4. Country-Specific Processing
+
+#### Data Integration Framework
+
+The analysis employs a three-case processing framework:
+
+-   **Case A**: Countries with both spatial farm data (fsfix) and
+    demographic projections (SSP2T)
+-   **Case B**: Countries with demographic projections but limited/no
+    spatial farm data
+-   **Case C**: Countries with only spatial farm data
 
 #### Case A: Full Data Countries
 
@@ -124,53 +182,7 @@ N'_ij(t) = N_ij(2000) × γ_ETH(t)
 where *γ*<sub>ETH</sub>(t) is Ethiopia's growth factor relative to base
 year 2000.
 
-## Data Sources and Corrections
-
-### Input Datasets
-
-1.  **LUGE Smallholder Map (2020)**
-    -   Source: SmallholderMap_20201202.shp
-    -   Spatial farm size distribution data
-    -   Admin-level disaggregation for African countries
-2.  **SSP2T Demographic Projections**
-    -   Source: ssp2t.rds
-    -   Farm number projections 2000-2060
-    -   Agricultural area projections
-3.  **FAO World Census of Agriculture (2010)**
-    -   Source: WCA_2010.csv
-    -   Validation and correction data
-    -   URL: <https://www.fao.org/world-census-agriculture/en>
-
-### Key Data Corrections Applied
-
-#### South Africa Correction
-
-Farm structure adjusted using Aliber study estimates for non-commercial
-farms: - Target: 2.6 million total farms - Source: Aliber & Hart (2009)
-smallholder farmer support study - Applied area-weighted scaling using
-Ricciardi et al. (2018) gross area estimates
-
-#### South Sudan Demographic Constraint
-
-Farm totals capped at 1 million farms based on: - Population (2000):
-6,032,267 (World Bank) - Average household size: 5.9 - Estimated
-households: 1,022,418 - Agricultural participation rate: 95% - **Maximum
-farms**: 971,297 ≈ 1,000,000
-
-Mathematical constraint:
-
-```         
-N_SSD(t) ≤ 1,000,000 ∀t
-```
-
-#### FAO Category Harmonization
-
-Original FAO categories mapped to standardized bins: - Holdings 0-\<1,
-1-\<2 → N0_1, N1_2\
-- Holdings 2-\<3, 3-\<4, 4-\<5 → N2_5 - Holdings 5-\<10 → N5_10 -
-Holdings 10-\<20 → N10_20 - Holdings ≥20 → N20\_
-
-### Missing Data Handling
+### 5. Missing Data Handling
 
 #### Administrative Unit Gaps
 
@@ -200,10 +212,10 @@ where *C* is the set of countries with complete data.
 
 | Variable         | Description                 | Units             |
 |------------------|-----------------------------|-------------------|
-| `GID_0`          | ISO3 country code           | \-                |
-| `NAME_0`         | Country name                | \-                |
-| `NAME_1`         | Administrative unit name    | \-                |
-| `Year`           | Projection year             | \-                |
+| `GID_0`          | ISO3 country code           | -                |
+| `NAME_0`         | Country name                | -                |
+| `NAME_1`         | Administrative unit name    | -                |
+| `Year`           | Projection year             | -                |
 | `N0_1`           | Farms 0-1 hectares          | count             |
 | `N1_2`           | Farms 1-2 hectares          | count             |
 | `N2_5`           | Farms 2-5 hectares          | count             |
@@ -231,9 +243,11 @@ where *C* is the set of countries with complete data.
 1.  **`full_farm_distributions_all_countries.rds`**
     -   Individual farm size samples before mean-shift correction
     -   Detailed distribution data for statistical analysis
+
 2.  **`full_farm_distributions_shifted.rds`**
     -   Individual farm size samples after mean-shift correction
     -   Used for validation and distribution analysis
+
 3.  **Validation Plots** (in `figs/` directory)
     -   `validation_totals_check.png` - SSP2T vs output totals
     -   `validation_areas_check.png` - Agricultural area consistency
@@ -264,37 +278,72 @@ Validates mean farm sizes align with area constraints:
 Ensures farm size distribution shapes remain realistic after
 corrections.
 
-## Usage
+## Data Corrections and Pre-processing
 
-### Requirements
+### Key Data Corrections Applied
 
-``` r
-library(sf)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(readxl)
+#### South Africa Correction
+
+Farm structure adjusted using Aliber study estimates for non-commercial
+farms: 
+- Target: 2.6 million total farms 
+- Source: Aliber & Hart (2009) smallholder farmer support study 
+- Applied area-weighted scaling using Ricciardi et al. (2018) gross area estimates
+
+Mathematical implementation:
+```r
+SAr <- c(174.67, 238.20, 119.08, 119.08, 85.55, 29.39)  # Ricciardi gross area (ha)
+sizemid <- c(0.5, 1, 2.5, 7.5, 15, 25)  # Midpoint of farm size bins
+SAr_count <- SAr / sizemid  # Calculate farm counts
+toadd <- round(2600000 / sum(SAr_count) * SAr_count)  # Scale to 2.6M total
 ```
 
-### Running the Analysis
+#### South Sudan Demographic Constraint
 
-``` r
-# Data preprocessing and harmonization
-source("fsdistfix.R")
+Farm totals capped at 1 million farms based on demographic analysis:
+- Population (2000): 6,032,267 (World Bank)
+- Average household size: 5.9
+- Estimated households: 1,022,418
+- Agricultural participation rate: 95%
+- **Maximum farms**: 971,297 ≈ 1,000,000
 
-# Full analysis with projections  
-source("test.R")
+Mathematical constraint:
+```         
+N_SSD(t) ≤ 1,000,000 ∀t
 ```
 
-### Loading Output Data
-
-``` r
-# Load spatial results
-farm_data <- st_read("output/fsfix_corrected_2000_2060.shp")
-
-# Load distribution data
-distributions <- readRDS("output/full_farm_distributions_shifted.rds")
+Implementation:
+```r
+target_total <- 1000000
+scaling_factor <- target_total / ssd_current_total
+# Apply scaling to all farm size categories
 ```
+
+#### FAO Category Harmonization
+
+Original FAO categories mapped to standardized bins:
+- Holdings without land, 0-<1 → N0_1
+- Holdings 1-<2 → N1_2
+- Holdings 2-<3, 3-<4, 4-<5 → N2_5
+- Holdings 5-<10 → N5_10
+- Holdings 10-<20 → N10_20
+- Holdings ≥20 → N20_
+
+Implementation uses `recode()` function with aggregation across categories:
+```r
+FAO <- FAO %>%
+  mutate(Item = recode(Item, `Holdings with land size 2-<3` = "N2_5", ...)) %>%
+  group_by(Area, Item) %>%
+  summarize(Number = sum(Value, na.rm = TRUE))
+```
+
+#### Data Quality Checks
+
+1. **Missing Value Analysis**: Systematic identification of missing data patterns across countries and farm size categories
+
+2. **Proportions Validation**: Cross-validation between LUGE microdata and FAO census data
+
+3. **Geometric Consistency**: Validation of spatial data integrity and coordinate systems
 
 ## References
 
@@ -320,4 +369,11 @@ If you use this dataset, please cite:
 Mehrabi, Zia (2025). African Farm Size Distribution Analysis. Better Planet Laboratory.
 ```
 
+## License
 
+MIT
+
+## Contact
+
+Better Planet Laboratory  
+University of Colorado Boulder
