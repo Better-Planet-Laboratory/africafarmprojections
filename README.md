@@ -1,8 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
 
 # African Farm Size Distribution Analysis
 
@@ -325,8 +320,4 @@ If you use this dataset, please cite:
 Mehrabi, Zia (2025). African Farm Size Distribution Analysis. Better Planet Laboratory.
 ```
 
-## License
 
-MIT
-
-## Contact
