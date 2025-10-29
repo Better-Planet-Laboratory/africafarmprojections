@@ -212,7 +212,7 @@ Original FAO categories mapped to standardized bins:
 ## Output Dataset
 
 ### Primary Output: `fsfix_corrected_2000_2060.shp`
-This data set is split into chunks for distribution on github. 
+This data set is not distributed on github due to size but can be created by running the scripts. 
 
 **Spatial Coverage**: All African countries with available data
 **Temporal Range**: 2000, 2010, 2020, 2030, 2040, 2050, 2060
