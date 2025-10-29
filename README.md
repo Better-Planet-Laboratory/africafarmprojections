@@ -1,17 +1,18 @@
 
-# African Farm Size Distribution Analysis
+# African Farm Size Distributions 2000-2060
 
 ## Overview
 
 This repository contains an analysis of African farm size
 distributions from 2000-2060, combining spatial farm structure data with
 demographic projections to create corrected and harmonized datasets for
-agricultural research and policy applications.
-
+agricultural research and policy applications. It pulls in existing harmonized distribution data,
+corrects errors in it, and then projects farm sizes using national farm size productions using a 
+ distribution shifting consistent with average farm size changes.
 
 ## Input Data Sources
 
-### 1. LUGE Smallholder Map (2020)
+### 1. CIAT/LUGE Smallholder Map (2020)
 - **File**: `input/handoff/SmallholderMap_20201202/SmallholderMap_20201202.shp`
 - **Description**: Spatial farm size distribution data with admin-level disaggregation for African countries
 - **Metadata**: `input/handoff/SmallholderMapping_Metadata.xlsx`
@@ -115,11 +116,11 @@ N'_20+ = Σ w_i for s'_i > 20
 
 The analysis employs a three-case processing framework:
 
--   **Case A**: Countries with both spatial farm data (fsfix) and
-    demographic projections (SSP2T)
+-   **Case A**: Countries with both spatial subnational farm distribution data (in the fsfix file) and mean 
+    demographic projections (in the SSP2T file)
 -   **Case B**: Countries with demographic projections but limited/no
     spatial farm data
--   **Case C**: Countries with only spatial farm data
+-   **Case C**: Countries with only subnational spatial farm data
 
 #### Case A: Full Data Countries
 
@@ -180,14 +181,6 @@ farms:
 - Source: Aliber & Hart (2009) smallholder farmer support study 
 - Applied area-weighted scaling using Ricciardi et al. (2018) gross area estimates
 
-Mathematical implementation:
-```r
-SAr <- c(174.67, 238.20, 119.08, 119.08, 85.55, 29.39)  # Ricciardi gross area (ha)
-sizemid <- c(0.5, 1, 2.5, 7.5, 15, 25)  # Midpoint of farm size bins
-SAr_count <- SAr / sizemid  # Calculate farm counts
-toadd <- round(2600000 / sum(SAr_count) * SAr_count)  # Scale to 2.6M total
-```
-
 #### South Sudan Demographic Constraint
 
 Farm totals capped at 1 million farms based on demographic analysis:
@@ -196,18 +189,6 @@ Farm totals capped at 1 million farms based on demographic analysis:
 - Estimated households: 1,022,418
 - Agricultural participation rate: 95%
 - **Maximum farms**: 971,297 ≈ 1,000,000
-
-Mathematical constraint:
-```         
-N_SSD(t) ≤ 1,000,000 ∀t
-```
-
-Implementation:
-```r
-target_total <- 1000000
-scaling_factor <- target_total / ssd_current_total
-# Apply scaling to all farm size categories
-```
 
 #### FAO Category Harmonization
 
@@ -219,21 +200,13 @@ Original FAO categories mapped to standardized bins:
 - Holdings 10-<20 → N10_20
 - Holdings ≥20 → N20_
 
-Implementation uses `recode()` function with aggregation across categories:
-```r
-FAO <- FAO %>%
-  mutate(Item = recode(Item, `Holdings with land size 2-<3` = "N2_5", ...)) %>%
-  group_by(Area, Item) %>%
-  summarize(Number = sum(Value, na.rm = TRUE))
-```
-
 #### Data Quality Checks
 
-1. **Missing Value Analysis**: Systematic identification of missing data patterns across countries and farm size categories
+1. **Missing Value Analysis**: Systematic identification of missing data patterns across countries and farm size categories is undertaken 
 
-2. **Proportions Validation**: Cross-validation between LUGE microdata and FAO census data
+2. **Proportions Validation**: Cross-validation between LUGE microdata and FAO census data is used
 
-3. **Geometric Consistency**: Validation of spatial data integrity and coordinate systems
+3. **Geometric Consistency**: Validation of spatial subnational data integrity and coordinate systems checked
 
 
 ## Output Dataset
@@ -242,7 +215,7 @@ FAO <- FAO %>%
 
 **Spatial Coverage**: All African countries with available data
 **Temporal Range**: 2000, 2010, 2020, 2030, 2040, 2050, 2060
-**Resolution**: Administrative level 1 (states/provinces)
+**Resolution**: Administrative level 1 (typically states/provinces)
 
 #### Variables
 
@@ -316,21 +289,6 @@ Validates mean farm sizes align with area constraints:
 Ensures farm size distribution shapes remain realistic after
 corrections.
 
-
-## Usage
-
-### Requirements
-
-``` r
-library(sf)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(readxl)
-library(terra)
-library(mapview)
-```
-
 ### Running the Analysis
 
 ``` r
@@ -352,37 +310,11 @@ distributions <- readRDS("output/full_farm_distributions_shifted.rds")
 ```
 
 
-## References
-
--   Aliber, M., & Hart, T. G. (2009). Should subsistence agriculture be
-    supported as a strategy to address rural food insecurity? *Agrekon*,
-    48(4), 434-458.
-
--   FAO. (2010). World Census of Agriculture. Rome: Food and Agriculture
-    Organization. Available:
-    <https://www.fao.org/world-census-agriculture/en>
-
--   Ricciardi, V., et al. (2018). How much of the world's food do
-    smallholders produce? *Global Food Security*, 17, 64-72.
-
--   World Bank. Population data. Available:
-    <https://data.worldbank.org/>
-
-
-
 ## Citation
 
 If you use this dataset, please cite:
 
 ```         
-Mehrabi, Zia (2025). African Farm Size Distribution Analysis. Better Planet Laboratory.
+Mehrabi, Zia (2025). African Farm Size Distributions 2000-2060. Better Planet Laboratory.
 ```
 
-## License
-
-MIT
-
-## Contact
-
-Better Planet Laboratory  
-University of Colorado Boulder
