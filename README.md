@@ -212,6 +212,7 @@ Original FAO categories mapped to standardized bins:
 ## Output Dataset
 
 ### Primary Output: `fsfix_corrected_2000_2060.shp`
+This data set is split into chunks for distribution on github. 
 
 **Spatial Coverage**: All African countries with available data
 **Temporal Range**: 2000, 2010, 2020, 2030, 2040, 2050, 2060
@@ -248,6 +249,8 @@ Original FAO categories mapped to standardized bins:
 -   `"No farm data available"` - No processing possible
 
 ### Additional Outputs
+
+These outputs are excluded from this repo due to large size but will be generated with the script. Validation plots are included for quick view.
 
 1.  **`full_farm_distributions_all_countries.rds`**
     -   Individual farm size samples before mean-shift correction
