@@ -315,9 +315,8 @@ distributions <- readRDS("output/full_farm_distributions_shifted.rds")
 
 ## Citation
 
-If you use this dataset, please cite the DOI assigned to it from where you download it:
+If you use this dataset, please cite the DOI assigned to it:
 
-The general citation prior to DOI assignment was:
 
 ```
 Mehrabi, Zia (2025). African Farm Size Distributions 2000-2060. Better Planet Laboratory. https://doi.org/10.5281/zenodo.17583014
