@@ -320,7 +320,7 @@ If you use this dataset, please cite the DOI assigned to it from where you downl
 The general citation prior to DOI assignment was:
 
 ```
-Mehrabi, Zia (2025). African Farm Size Distributions 2000-2060. Better Planet Laboratory. URL: https://github.com/Better-Planet-Laboratory/africafarmprojections
+Mehrabi, Zia (2025). African Farm Size Distributions 2000-2060. Better Planet Laboratory. 
 
 ```         
 
